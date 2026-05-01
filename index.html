@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanishka Net | AI Tools & Creative Digital Hub</title>
+    
+    <link rel="icon" href="https://raw.githubusercontent.com/nadeeshancloud-lang/kanishkanet.github.io/main/logo.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00cfff',
+                        secondary: '#0a0a0a'
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'Poppins', 'sans-serif'],
+                        mono: ['ui-monospace', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#0a0a0a] text-white antialiased overflow-x-hidden selection:bg-[#00cfff]/30">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-secondary transition-opacity duration-800">
+        <div class="relative">
+            <div class="w-24 h-24 border-4 border-primary rounded-full border-t-transparent shadow-[0_0_20px_rgba(0,207,255,0.4)] animate-[spin_2s_linear_infinite]"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+                <img src="https://raw.githubusercontent.com/nadeeshancloud-lang/kanishkanet.github.io/main/logo.ico" alt="Logo" class="w-12 h-12 rounded-full">
+            </div>
+        </div>
+        <div class="mt-8 text-center animate-[fade-in-up_0.5s_ease-out_0.5s_both]">
+            <span class="text-2xl font-bold tracking-widest uppercase text-primary neon-glow">Kanishka Net</span>
+            <div class="mt-2 text-white/40 text-xs font-mono">INITIALIZING CORE SYSTEMS...</div>
+        </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 w-64 h-1 bg-white/5 rounded-full overflow-hidden">
+            <div id="loading-progress" class="h-full bg-primary shadow-[0_0_10px_#00cfff] w-0 transition-all duration-[2500ms] ease-in-out"></div>
+        </div>
+    </div>
+
+    <!-- Background Canvas -->
+    <canvas id="bg-canvas" class="fixed inset-0 -z-10 pointer-events-none"></canvas>
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })">
+                <img src="https://raw.githubusercontent.com/nadeeshancloud-lang/kanishkanet.github.io/main/logo.ico" alt="Kanishka Net" class="w-10 h-10 rounded-full border border-primary/30">
+                <span class="text-xl font-bold tracking-tight text-white neon-glow">
+                    Kanishka <span class="text-primary italic">Net</span>
+                </span>
+            </div>
+
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#home" class="text-sm font-medium text-white/70 hover:text-primary transition-colors duration-300">Home</a>
+                <a href="#hub" class="text-sm font-medium text-white/70 hover:text-primary transition-colors duration-300">Hub</a>
+                <a href="#videos" class="text-sm font-medium text-white/70 hover:text-primary transition-colors duration-300">Videos</a>
+                <a href="#about" class="text-sm font-medium text-white/70 hover:text-primary transition-colors duration-300">About</a>
+                <a href="#feedback" class="text-sm font-medium text-white/70 hover:text-primary transition-colors duration-300">Feedback</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div id="auth-container">
+                    <button id="auth-btn" class="flex items-center gap-2 px-6 py-2 bg-primary/10 border border-primary/30 text-primary rounded-full font-medium hover:bg-primary hover:text-secondary transition-all duration-300">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Log In</span>
+                    </button>
+                </div>
+                
+                <button id="mobile-menu-btn" class="p-2 hover:bg-white/5 rounded-full md:hidden">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar (Mobile Mega Menu) -->
+    <div id="mega-menu" class="fixed inset-0 z-[60] glass p-8 pointer-events-auto transform translate-x-full transition-transform duration-300">
+        <div class="flex justify-end gap-4 mb-12">
+            <button id="close-menu" class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+        <div class="grid gap-6">
+            <a href="#home" class="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/5 group transition-all">
+                <div class="p-3 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform"><i data-lucide="home"></i></div>
+                <span class="text-xl font-medium">Home</span>
+            </a>
+            <a href="#hub" class="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/5 group transition-all">
+                <div class="p-3 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform"><i data-lucide="grid"></i></div>
+                <span class="text-xl font-medium">Hub Services</span>
+            </a>
+            <a href="#videos" class="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/5 group transition-all">
+                <div class="p-3 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform"><i data-lucide="video"></i></div>
+                <span class="text-xl font-medium">Video Gallery</span>
+            </a>
+            <a href="#about" class="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/5 group transition-all">
+                <div class="p-3 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform"><i data-lucide="info"></i></div>
+                <span class="text-xl font-medium">About Us</span>
+            </a>
+            <a href="#feedback" class="flex items-center gap-6 p-4 rounded-2xl hover:bg-white/5 group transition-all">
+                <div class="p-3 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform"><i data-lucide="star"></i></div>
+                <span class="text-xl font-medium">User Feedback</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="pt-20">
+        <!-- Hero Section -->
+        <section id="home" class="min-h-[90vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden relative">
+            <div class="relative mb-8 transform hover:scale-105 transition-transform duration-500">
+                <div class="absolute -inset-10 bg-primary/20 blur-[120px] rounded-full animate-pulse"></div>
+                <img src="https://raw.githubusercontent.com/nadeeshancloud-lang/kanishkanet.github.io/main/logo.ico" alt="Logo" class="w-32 h-32 md:w-48 md:h-48 rounded-full border-2 border-primary/30 relative z-10 p-2 glass animate-float">
+            </div>
+
+            <h1 class="text-5xl md:text-8xl font-bold mb-6 tracking-tight animate-[fade-in-up_0.8s_ease-out_both]">
+                Welcome to <span class="text-primary neon-glow">Kanishka Net</span>
+            </h1>
+            
+            <p class="max-w-2xl text-lg md:text-xl text-white/60 mb-10 leading-relaxed animate-[fade-in-up_0.8s_ease-out_0.2s_both]">
+                A high-performance hub for AI innovation, creative digital design, and premium tech content. 
+                Official home of <span class="text-white font-semibold">@kanishkanetofficial</span>.
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-4 animate-[fade-in-up_0.8s_ease-out_0.4s_both]">
+                <button onclick="document.getElementById('hub').scrollIntoView({ behavior: 'smooth' })" class="px-8 py-4 bg-primary text-secondary rounded-full font-bold flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-[0_0_30px_rgba(0,207,255,0.4)]">
+                    Explore Hub <i data-lucide="chevron-right"></i>
+                </button>
+                <button onclick="document.getElementById('videos').scrollIntoView({ behavior: 'smooth' })" class="px-8 py-4 glass border border-white/20 text-white rounded-full font-bold flex items-center gap-2 hover:bg-white/10 transition-all">
+                    Watch Videos
+                </button>
+            </div>
+
+            <!-- Mouse Scroll Indicator -->
+            <div class="absolute bottom-10 animate-[bounce_2s_infinite]">
+                <div class="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center">
+                    <div class="w-1 h-2 bg-primary rounded-full mt-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Hub Services Section -->
+        <section id="hub" class="py-32 px-4 max-w-7xl mx-auto">
+            <div class="text-center mb-20 scroll-fade">
+                <h2 class="text-4xl md:text-6xl font-bold mb-4">Innovation <span class="text-primary italic">Hub</span></h2>
+                <p class="text-white/40">Next-generation tools designed for the future.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- AI Assistant Card -->
+                <div class="glass p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden group border border-white/5 scroll-fade-right">
+                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px]"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+                            <i data-lucide="message-square" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4">Kanishka Net AI</h3>
+                        <p class="text-white/60 mb-8 leading-relaxed">
+                            Experience the power of our custom-built AI assistant. From coding support to 
+                            content ideation, our AI is ready to optimize your workflow in seconds.
+                        </p>
+                        <a href="chatbot.html" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-primary hover:text-black transition-all">
+                            Open AI Chatbot <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Photo Editor Card -->
+                <div class="glass p-8 md:p-12 rounded-[2.5rem] relative overflow-hidden group border border-white/5 scroll-fade-left">
+                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px]"></div>
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 bg-cyan-500/20 rounded-2xl flex items-center justify-center text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
+                            <i data-lucide="grid" class="w-8 h-8"></i>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4">Kanishka Net Pix</h3>
+                        <p class="text-white/60 mb-8 leading-relaxed">
+                            Our professional photo editing suite. Create stunning visuals, apply futuristic 
+                            filters, and enhance your digital presence with high-quality artistic tools.
+                        </p>
+                        <a href="kanishka net-pix.html" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-xl hover:bg-cyan-400 hover:text-black transition-all">
+                            Explore Pix Editor <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Integration Section -->
+        <section id="videos" class="py-32 bg-white/2 backdrop-blur-sm">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-8 mb-16 scroll-fade">
+                    <div>
+                        <h2 class="text-4xl md:text-6xl font-bold mb-4 flex items-center gap-4">
+                            <i data-lucide="youtube" class="text-red-500 w-12 h-12"></i>
+                            Kanishka <span class="text-primary italic">Videos</span>
+                        </h2>
+                        <p class="text-white/40">Watch the latest tech insights and tutorials from our official channel.</p>
+                    </div>
+                    <a href="https://youtube.com/@kanishkanet?si=hf3jPRuPVBuFMkM2" target="_blank" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-full transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(220,38,38,0.3)]">
+                        Visit Channel
+                    </a>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6" id="video-grid">
+                    <!-- Videos generated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Feedback Section -->
+        <section id="feedback" class="py-32 px-4 scroll-fade">
+            <div class="max-w-4xl mx-auto glass p-10 md:p-16 rounded-[3rem] border border-white/5 relative overflow-hidden">
+                <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px]"></div>
+                
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold mb-4">Your Voice <span class="text-primary italic">Matters</span></h2>
+                    <p class="text-white/40">Share your ideas, report issues, or suggest new features for Kanishka Net.</p>
+                </div>
+
+                <form class="space-y-6 relative z-10" onsubmit="event.preventDefault()">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-white/40 ml-1">Full Name</label>
+                            <input type="text" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-primary/50 transition-colors" placeholder="Kanishka Nadeeshan">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-white/40 ml-1">Email Address</label>
+                            <input type="email" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-primary/50 transition-colors" placeholder="example@gmail.com">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-white/40 ml-1">Feedback Category</label>
+                        <select class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-primary/50 transition-colors appearance-none text-white/60">
+                            <option>General Feedback</option>
+                            <option>Feature Suggestion</option>
+                            <option>Bug Report</option>
+                            <option>Partnership</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-white/40 ml-1">Your Message</label>
+                        <textarea rows="4" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-primary/50 transition-colors resize-none" placeholder="How can we improve..."></textarea>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="flex items-center gap-2 text-primary/40">
+                            <i data-lucide="star" class="w-5 h-5 fill-current transition-colors cursor-pointer hover:text-primary"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current transition-colors cursor-pointer hover:text-primary"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current transition-colors cursor-pointer hover:text-primary"></i>
+                            <i data-lucide="star" class="w-5 h-5 fill-current transition-colors cursor-pointer hover:text-primary"></i>
+                            <i data-lucide="star" class="w-5 h-5 transition-colors cursor-pointer hover:text-primary hover:fill-current"></i>
+                            <span class="ml-2 text-sm text-white/40 italic">Rating (4.0)</span>
+                        </div>
+                        <button class="w-full md:w-auto px-10 py-4 bg-primary text-secondary font-bold rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(0,207,255,0.3)]">
+                            Submit Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="pt-24 pb-12 px-4 border-t border-white/5 overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-12 mb-20">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-3 mb-6">
+                        <img src="https://raw.githubusercontent.com/nadeeshancloud-lang/kanishkanet.github.io/main/logo.ico" alt="Logo" class="w-10 h-10 rounded-full">
+                        <span class="text-2xl font-bold neon-glow">Kanishka <span class="text-primary italic">Net</span></span>
+                    </div>
+                    <p class="text-white/40 max-w-sm mb-8 leading-relaxed">
+                        Empowering the digital era with advanced AI solutions, creative content, and a 
+                        community-driven tech ecosystem.
+                    </p>
+                    <div class="flex items-center gap-4">
+                        <a href="https://youtube.com/@kanishkanet" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:text-primary transition-colors"><i data-lucide="youtube" class="w-5 h-5"></i></a>
+                        <a href="https://whatsapp.com/channel/0029VbCRifW5Ui2d00DILX3c" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:text-primary transition-colors"><i data-lucide="message-circle" class="w-5 h-5"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Platform</h4>
+                    <ul class="space-y-4 text-white/40 font-medium">
+                        <li><a href="#hub" class="hover:text-primary transition-colors">AI Assistant</a></li>
+                        <li><a href="#hub" class="hover:text-primary transition-colors">Pix Editor</a></li>
+                        <li><a href="#videos" class="hover:text-primary transition-colors">Video Hub</a></li>
+                        <li><a href="#feedback" class="hover:text-primary transition-colors">Community</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-bold mb-6">Legal</h4>
+                    <ul class="space-y-4 text-white/40 font-medium">
+                        <li><a href="#" class="hover:text-primary transition-colors">Terms of Use</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="pt-12 border-t border-white/5 text-center relative">
+                <p class="text-white/20 text-sm mb-4">
+                    All Rights Reserved © 2026 <span class="text-white font-semibold">Kanishka Net</span>
+                </p>
+                <p class="text-sm font-medium text-white/40 flex items-center justify-center gap-2">
+                    Made with <i data-lucide="star" class="w-3.5 h-3.5 text-primary fill-current"></i> by <span class="text-primary/80 neon-glow">Amila Kanishka Nadeeshan</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating WhatsApp Channel Button -->
+    <a href="https://whatsapp.com/channel/0029VbCRifW5Ui2d00DILX3c" target="_blank" class="fixed bottom-8 right-8 z-[90] w-16 h-16 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all group">
+        <div class="absolute inset-0 bg-[#25D366] rounded-full animate-ping opacity-20"></div>
+        <i data-lucide="message-circle" class="w-8 h-8"></i>
+        <span class="absolute right-full mr-4 px-4 py-2 glass rounded-xl text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            Join WhatsApp Channel
+        </span>
+    </a>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div id="close-auth-bg" class="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer"></div>
+        <div class="relative w-full max-w-md glass p-8 md:p-12 rounded-[2.5rem] border border-white/10 shadow-2xl transform scale-90 opacity-0 transition-all duration-300" id="auth-box">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 glass-blue rounded-3xl flex items-center justify-center text-primary mx-auto mb-6">
+                    <i data-lucide="log-in" class="w-10 h-10"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Welcome Back</h3>
+                <p class="text-white/40 text-sm">Sign in to access your unique user code and hub tools.</p>
+            </div>
+
+            <form class="space-y-4" id="login-form">
+                <button type="submit" id="google-login-btn" class="w-full flex items-center justify-center gap-4 p-4 bg-white text-black font-bold rounded-2xl hover:bg-white/90 transition-all">
+                    <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5">
+                    Continue with Google
+                </button>
+                
+                <div class="flex items-center gap-4 my-8 text-white/10 uppercase text-[10px] font-bold tracking-widest">
+                    <div class="h-px flex-1 bg-white/10"></div>
+                    Or Email
+                    <div class="h-px flex-1 bg-white/10"></div>
+                </div>
+
+                <div class="space-y-4">
+                    <input type="email" placeholder="Gmail Address" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-primary transition-colors">
+                    <input type="password" placeholder="Password" class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl outline-none focus:border-primary transition-colors">
+                </div>
+
+                <button type="button" class="w-full py-4 bg-primary/10 border border-primary/20 text-primary font-bold rounded-2xl hover:bg-primary/20 transition-all mt-4">
+                    Log In
+                </button>
+
+                <div class="pt-6 text-center">
+                    <button type="button" class="text-white/40 text-sm hover:text-primary transition-colors">
+                        Forgot your 9-digit unique code?
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <button id="back-to-top" class="fixed bottom-32 right-8 z-[90] w-12 h-12 glass rounded-full flex items-center justify-center border border-white/10 hover:border-primary/50 transition-all opacity-0 translate-y-10">
+        <i data-lucide="chevron-up" class="w-6 h-6"></i>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>

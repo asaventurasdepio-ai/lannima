@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --color-primary: #00cfff;
+  --color-secondary: #0a0a0a;
+  --color-accent: #00f2ff;
+}
+
+body {
+  font-family: "Outfit", "Poppins", ui-sans-serif, system-ui, sans-serif;
+  background-color: var(--color-secondary);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background-color: var(--color-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 207, 255, 0.3);
+  border-radius: 9999px;
+  transition: background-color 0.3s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 207, 255, 0.5);
+}
+
+/* Glassmorphism Styles */
+.glass {
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37);
+}
+
+.glass-blue {
+  background-color: rgba(0, 207, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 207, 255, 0.2);
+  box-shadow: 0 0 20px rgba(0,207,255,0.15);
+}
+
+.neon-glow {
+  text-shadow: 0 0 10px rgba(0, 207, 255, 0.5), 0 0 20px rgba(0, 207, 255, 0.3);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Specific component animations replaced previously handled by framer-motion */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scroll-fade {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+.scroll-fade.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-fade-right {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 0.8s ease-out;
+}
+.scroll-fade-right.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-fade-left {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 0.8s ease-out;
+}
+.scroll-fade-left.is-visible {
+  opacity: 1;
+  transform: translateX(0);
+}

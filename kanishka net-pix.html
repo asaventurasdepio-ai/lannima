@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kanishka Net-Pix - Photo Editor</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Upgraded Vibrant Color Palette */
+            --primary: #2563EB; /* Vibrant Blue */
+            --primary-light: #60A5FA;
+            --accent: #F59E0B; /* Dark Yellow / Amber */
+            --danger: #EF4444; /* Mild Red / Coral */
+            --dark: #0F172A; /* Slate Black */
+            --light: #F8FAFC; /* Clean Light Grey */
+            --surface: #FFFFFF;
+            
+            --text: #1E293B;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --selection: #3B82F6;
+            
+            /* Modern Shadows */
+            --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.12);
+            --shadow-xl: 0 24px 48px -12px rgba(15, 23, 42, 0.18);
+            --shadow-glow: 0 4px 14px rgba(37, 99, 235, 0.25);
+            
+            /* Transitions */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--light);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--light);
+        }
+
+        /* Header - Modern Glassmorphism & Gradients */
+        .header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        /* Colorful top accent line */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--danger), var(--accent));
+        }
+
+        .logo {
+            font-family: 'Fraunces', serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--danger), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), #1D4ED8);
+            color: white;
+            box-shadow: var(--shadow-glow);
+        }
+        .btn-primary:hover { 
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4); 
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary { 
+            background: linear-gradient(135deg, var(--dark), #1E293B); 
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-secondary:hover { 
+            box-shadow: var(--shadow-md);
+            filter: brightness(1.2);
+        }
+
+        .btn-ghost { 
+            background: var(--surface); 
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { 
+            background: var(--light); 
+            color: var(--primary);
+            border-color: var(--primary-light);
+        }
+
+        .btn-icon {
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border-radius: 10px;
+        }
+
+        /* Main Layout */
+        .main-content { 
+            display: flex; 
+            flex: 1; 
+            overflow: hidden; 
+            position: relative; 
+        }
+
+        /* Sidebar - Floating Modern Icons */
+        .sidebar {
+            width: 88px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.25rem 0;
+            z-index: 20;
+            flex-shrink: 0;
+            gap: 0.5rem;
+        }
+
+        .tool-btn {
+            width: 68px;
+            height: 64px;
+            border: none;
+            background: transparent;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            gap: 6px;
+            transition: var(--transition);
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        .tool-btn:hover { 
+            background: var(--light); 
+            color: var(--dark);
+            transform: scale(1.05);
+        }
+        .tool-btn.active { 
+            background: var(--surface);
+            color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+        /* Colorful indicator for active tool */
+        .tool-btn.active::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            top: 20%;
+            height: 60%;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+            border-radius: 0 4px 4px 0;
+        }
+        .tool-btn i { font-size: 1.35rem; transition: var(--transition); }
+        .tool-btn.active i { transform: translateY(-2px); color: var(--primary); }
+
+        /* Panel Drawer - Clean and Modern */
+        .panel-drawer {
+            width: 340px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+            z-index: 10;
+            flex-shrink: 0;
+            box-shadow: 10px 0 20px -10px rgba(0,0,0,0.02);
+        }
+        .panel-drawer.active { display: flex; }
+
+        .panel-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 800;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            color: var(--dark);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+        
+        .close-panel-mobile { 
+            display: none; 
+            background: none; 
+            border: none; 
+            font-size: 1.25rem; 
+            cursor: pointer;
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .close-panel-mobile:hover { background: var(--light); color: var(--danger); }
+
+        .panel-content { 
+            padding: 1.5rem; 
+            padding-bottom: 100px;
+        }
+
+        .panel-section {
+            margin-bottom: 1.75rem;
+        }
+
+        .panel-section-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .panel-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Canvas Area - Dot Matrix Design */
+        .canvas-area {
+            flex: 1;
+            background-color: var(--light);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* Modern Dot Pattern */
+            background-image: radial-gradient(var(--border) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+
+        .canvas-toolbar {
+            height: 60px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            gap: 0.5rem;
+            z-index: 5;
+            flex-shrink: 0;
+            margin-top: 10px;
+        }
+
+        .zoom-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: var(--surface);
+            padding: 0.35rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+        }
+
+        .canvas-container {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            box-shadow: var(--shadow-xl);
+            background: white;
+            user-select: none;
+            transform-origin: center center;
+            border-radius: 4px;
+            transition: box-shadow 0.3s ease;
+        }
+
+        /* Transform Controls */
+        .transform-controls {
+            position: absolute;
+            border: 2px solid var(--primary);
+            pointer-events: none;
+            display: none;
+            z-index: 100;
+            box-sizing: border-box;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.5);
+        }
+
+        .transform-controls.active { display: block; }
+
+        .transform-handle {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: var(--surface);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            pointer-events: auto;
+            transform: translate(-50%, -50%);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.1s;
+        }
+        .transform-handle:hover { transform: translate(-50%, -50%) scale(1.2); background: var(--primary); }
+
+        .handle-nw { top: 0; left: 0; cursor: nwse-resize; }
+        .handle-ne { top: 0; left: 100%; cursor: nesw-resize; }
+        .handle-sw { top: 100%; left: 0; cursor: nesw-resize; }
+        .handle-se { top: 100%; left: 100%; cursor: nwse-resize; }
+        
+        .rotate-handle {
+            position: absolute;
+            bottom: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 32px;
+            background: var(--surface);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            pointer-events: auto;
+            cursor: grab;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            color: var(--primary);
+            transition: var(--transition);
+        }
+        .rotate-handle:hover { background: var(--primary); color: white; transform: translateX(-50%) scale(1.1); }
+        .rotate-handle:active { cursor: grabbing; background: var(--dark); border-color: var(--dark); color: white;}
+
+        /* In-place Text Editor */
+        .text-editor-overlay {
+            position: absolute;
+            background: transparent;
+            border: 2px dashed var(--accent);
+            padding: 0;
+            margin: 0;
+            outline: none;
+            z-index: 200;
+            display: none;
+            line-height: 1.2;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            cursor: text;
+        }
+
+        /* Context Menu - Modern Glass */
+        .context-menu {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-xl);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 200px;
+            z-index: 9999;
+            display: none;
+            animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: top left;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9) translateY(-10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .context-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .context-item:hover { 
+            background: var(--light); 
+            color: var(--primary);
+            padding-left: 18px;
+        }
+        .context-item i { 
+            font-size: 0.85rem; 
+            color: var(--text-muted);
+            margin-right: 10px;
+            width: 16px;
+            transition: var(--transition);
+        }
+        .context-item:hover i { color: var(--primary); }
+        
+        .context-separator { 
+            height: 1px; 
+            background: var(--border); 
+            margin: 6px 0; 
+        }
+        .context-shortcut {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: monospace;
+            background: var(--light);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Template Cards - Attractive Gradients */
+        .template-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .template-card {
+            aspect-ratio: 1;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            overflow: hidden;
+            position: relative;
+            background: var(--surface);
+            box-shadow: var(--shadow-sm);
+        }
+        .template-card:hover { 
+            border-color: var(--primary-light);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+        .template-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .template-card .template-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(15,23,42,0.9), transparent);
+            color: white;
+            padding: 1.5rem 0.75rem 0.75rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Preset Cards - Vibrant Icons */
+        .preset-card { 
+            padding: 1rem; 
+            border: 2px solid transparent; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            background: var(--surface); 
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .preset-card:hover { 
+            border-color: var(--primary-light); 
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .preset-card i {
+            font-size: 1.25rem;
+            color: var(--accent);
+            background: rgba(245, 158, 11, 0.15);
+            padding: 12px;
+            border-radius: 10px;
+        }
+        .preset-card b {
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .preset-card small {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Utilities */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+        .w-100 { width: 100%; }
+        .mt-2 { margin-top: 1.25rem; }
+        .mb-1 { margin-bottom: 0.75rem; }
+        .mb-2 { margin-bottom: 1.5rem; }
+        
+        .slider-container { margin-bottom: 1.25rem; }
+        .slider-container label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        .slider { 
+            width: 100%; 
+            accent-color: var(--primary);
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            outline: none;
+            -webkit-appearance: none;
+            transition: var(--transition);
+        }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+            border: 2px solid white;
+            transition: var(--transition);
+        }
+        .slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+        
+        .color-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            margin-bottom: 1.25rem; 
+        }
+        .color-preview { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 10px; 
+            border: 2px solid var(--border); 
+            overflow: hidden; 
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .color-preview:hover { border-color: var(--primary); transform: scale(1.05); }
+        input[type="color"] { 
+            position: absolute; 
+            top: -50%; 
+            left: -50%; 
+            width: 200%; 
+            height: 200%; 
+            cursor: pointer; 
+            border: none;
+            padding: 0;
+        }
+
+        .properties-section { 
+            border-top: 1px dashed var(--border); 
+            padding-top: 1.5rem; 
+            margin-top: 1.5rem; 
+        }
+
+        /* Toggle Switch - Colorful */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            font-weight: 500;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            background: var(--border);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .toggle-switch.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .toggle-switch.active::after {
+            left: 25px;
+        }
+
+        /* Select Dropdown & Textareas */
+        select, textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-family: 'DM Sans', sans-serif;
+            background: var(--light);
+            color: var(--text);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        select:hover, textarea:hover { background: var(--surface); border-color: #CBD5E1; }
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--surface);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Layer Items */
+        .layer-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 0.5rem;
+            background: var(--light);
+            border: 1px solid transparent;
+        }
+        .layer-item:hover { 
+            background: var(--surface); 
+            border-color: var(--border);
+            transform: translateX(4px);
+        }
+        .layer-item.active { 
+            background: rgba(37, 99, 235, 0.08);
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+        .layer-item i {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            width: 24px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .layer-item.active i { color: var(--primary); }
+        .layer-item span {
+            flex: 1;
+            font-size: 0.875rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Gradient Presets */
+        .gradient-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+        .gradient-preset {
+            height: 44px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+        .gradient-preset:hover { transform: scale(1.1) rotate(2deg); box-shadow: var(--shadow-md); }
+        .gradient-preset.active { border-color: var(--dark); transform: scale(1.05); }
+
+        /* Shape Buttons */
+        .shape-btn {
+            border: 2px solid var(--border); 
+            height: 70px; 
+            border-radius: 14px;
+            background: var(--surface);
+            transition: var(--transition);
+        }
+        .shape-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 1024px) {
+            .panel-drawer { width: 320px; }
+        }
+
+        @media (max-width: 768px) {
+            .header { 
+                padding: 0 1rem; 
+                height: 60px; 
+            }
+            .logo { font-size: 1.4rem; }
+            .btn span { display: none; }
+            .btn { padding: 0.5rem; }
+            
+            .sidebar {
+                order: 3;
+                width: 100%;
+                height: 70px;
+                flex-direction: row;
+                border-right: none;
+                border-top: 1px solid var(--border);
+                justify-content: space-around;
+                padding: 0.5rem 0;
+                overflow-x: auto;
+                gap: 0;
+            }
+            
+            .tool-btn { 
+                height: 100%; 
+                flex: 1;
+                min-width: 64px;
+                border-radius: 8px;
+                font-size: 0.6rem;
+            }
+            .tool-btn.active::before {
+                top: 0; left: 20%; height: 4px; width: 60%;
+                border-radius: 0 0 4px 4px;
+            }
+            
+            .panel-drawer {
+                position: fixed;
+                bottom: 70px;
+                left: 0;
+                width: 100%;
+                height: auto;
+                max-height: 50vh;
+                min-height: 250px;
+                border-right: none;
+                border-top: 1px solid var(--border);
+                box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+                z-index: 1000;
+                border-radius: 24px 24px 0 0;
+            }
+            .close-panel-mobile { display: flex; align-items: center; justify-content: center; }
+            
+            .main-content { flex-direction: column; }
+            .canvas-area { height: calc(100vh - 130px); }
+            .canvas-container { padding: 20px; }
+            
+            .template-grid {
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+            .template-grid::-webkit-scrollbar { display: none; }
+            .template-card { width: 120px; height: 120px; flex-shrink: 0; aspect-ratio: auto; }
+            
+            .preset-scroll-container {
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+            }
+            .preset-scroll-container::-webkit-scrollbar { display: none; }
+            .preset-card {
+                min-width: 150px;
+                margin-bottom: 0;
+                flex-direction: column;
+                text-align: center;
+                padding: 1rem;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+            border: 2px solid var(--surface);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-layer-group" style="color: var(--primary)"></i>
+                <span>Kanishka Net-Pix</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost btn-icon" id="undoBtn" title="Undo">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button class="btn btn-ghost btn-icon" id="redoBtn" title="Redo">
+                    <i class="fas fa-redo"></i>
+                </button>
+                <button class="btn btn-primary" id="downloadBtn">
+                    <i class="fas fa-download"></i>
+                    <span>Export</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <button class="tool-btn active" data-target="upload-panel">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Upload</span>
+                </button>
+                <button class="tool-btn" data-target="templates-panel">
+                    <i class="fas fa-th-large"></i>
+                    <span>Templates</span>
+                </button>
+                <button class="tool-btn" data-target="text-panel">
+                    <i class="fas fa-font"></i>
+                    <span>Text</span>
+                </button>
+                <button class="tool-btn" data-target="elements-panel">
+                    <i class="fas fa-shapes"></i>
+                    <span>Shapes</span>
+                </button>
+                <button class="tool-btn" data-target="adjust-panel">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Adjust</span>
+                </button>
+                <button class="tool-btn" data-target="ai-panel">
+                    <i class="fas fa-magic"></i>
+                    <span>AI Designer</span>
+                </button>
+                <button class="tool-btn" data-target="layers-panel" onclick="updateLayersList()">
+                    <i class="fas fa-layer-group"></i>
+                    <span>Layers</span>
+                </button>
+            </aside>
+
+            <!-- Panel Drawer -->
+            <div class="panel-drawer active" id="sidePanel">
+                <div class="panel-header" id="panelHeader">
+                    <span id="panelTitle">Upload & Size</span>
+                    <button class="close-panel-mobile" onclick="closePanel()">
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                </div>
+                
+                <!-- Common Object Properties -->
+                <div id="common-properties" style="padding: 1.5rem; background: var(--light); border-bottom: 1px solid var(--border); display: none;">
+                    <div class="slider-container">
+                        <label><span>Opacity</span> <span id="opacityVal" style="color:var(--primary); font-weight:700">100%</span></label>
+                        <input type="range" class="slider" id="opacitySlider" min="0" max="1" step="0.01" value="1" oninput="document.getElementById('opacityVal').innerText=Math.round(this.value*100)+'%'">
+                    </div>
+                    
+                    <div class="panel-section-title">Shadow Effect</div>
+                    <div class="grid-2">
+                        <div class="color-row" style="margin-bottom:0">
+                            <div class="color-preview"><input type="color" id="shadowColorInput" value="#000000"></div>
+                            <span style="font-size:0.875rem; font-weight:600">Color</span>
+                        </div>
+                        <div>
+                            <input type="range" class="slider" id="shadowBlurInput" min="0" max="50" value="0" style="margin-top: 10px;">
+                        </div>
+                    </div>
+                    <div class="grid-2 mt-2">
+                         <div>
+                            <label style="font-size:0.75rem; color: var(--text-muted)">Offset X</label>
+                            <input type="range" class="slider" id="shadowOffXInput" min="-50" max="50" value="0">
+                         </div>
+                         <div>
+                            <label style="font-size:0.75rem; color: var(--text-muted)">Offset Y</label>
+                            <input type="range" class="slider" id="shadowOffYInput" min="-50" max="50" value="0">
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Uploads Panel -->
+                <div class="panel-content" id="upload-panel">
+                    <div class="panel-section">
+                        <button class="btn btn-primary w-100 mb-2" id="uploadBtn" style="padding: 1rem; font-size: 1rem;">
+                            <i class="fas fa-image"></i> Upload Image
+                        </button>
+                        <input type="file" id="imageUpload" accept="image/*" hidden>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <div class="panel-section-title">Canvas Size</div>
+                        <div class="preset-scroll-container" id="presetContainer">
+                            <div class="preset-card" onclick="resizeCanvas(1280, 720)">
+                                <i class="fab fa-youtube"></i>
+                                <div>
+                                    <b>YouTube</b><br><small>1280 x 720</small>
+                                </div>
+                            </div>
+                            <div class="preset-card" onclick="resizeCanvas(1080, 1080)">
+                                <i class="fab fa-instagram" style="background: rgba(239, 68, 68, 0.15); color: var(--danger);"></i>
+                                <div>
+                                    <b>Instagram</b><br><small>1080 x 1080</small>
+                                </div>
+                            </div>
+                            <div class="preset-card" onclick="resizeCanvas(1080, 1920)">
+                                <i class="fab fa-tiktok" style="background: rgba(15, 23, 42, 0.1); color: var(--dark);"></i>
+                                <div>
+                                    <b>Story/Reel</b><br><small>1080 x 1920</small>
+                                </div>
+                            </div>
+                            <div class="preset-card" onclick="resizeCanvas(1200, 630)">
+                                <i class="fab fa-facebook" style="background: rgba(37, 99, 235, 0.15); color: var(--primary);"></i>
+                                <div>
+                                    <b>Facebook</b><br><small>1200 x 630</small>
+                                </div>
+                            </div>
+                            <div class="preset-card" onclick="resizeCanvas(1500, 500)">
+                                <i class="fab fa-twitter" style="background: rgba(96, 165, 250, 0.15); color: var(--primary-light);"></i>
+                                <div>
+                                    <b>Twitter</b><br><small>1500 x 500</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Templates Panel -->
+                <div class="panel-content" id="templates-panel" style="display: none;">
+                    <div class="panel-section">
+                        <div class="panel-section-title">Social Media</div>
+                        <div class="template-grid">
+                            <div class="template-card" onclick="loadTemplate('youtube')">
+                                <div style="background: linear-gradient(135deg, #EF4444 0%, #991B1B 100%); height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem;">
+                                    <i class="fab fa-youtube"></i>
+                                </div>
+                                <div class="template-label">YouTube</div>
+                            </div>
+                            <div class="template-card" onclick="loadTemplate('instagram')">
+                                <div style="background: linear-gradient(45deg, #F59E0B 0%, #EF4444 50%, #BE185D 100%); height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem;">
+                                    <i class="fab fa-instagram"></i>
+                                </div>
+                                <div class="template-label">Instagram</div>
+                            </div>
+                            <div class="template-card" onclick="loadTemplate('tiktok')">
+                                <div style="background: linear-gradient(135deg, #0F172A 0%, #06B6D4 50%, #E11D48 100%); height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem;">
+                                    <i class="fab fa-tiktok"></i>
+                                </div>
+                                <div class="template-label">TikTok</div>
+                            </div>
+                            <div class="template-card" onclick="loadTemplate('business')">
+                                <div style="background: linear-gradient(135deg, #2563EB 0%, #4338CA 100%); height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem;">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="template-label">Business</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="panel-section">
+                        <div class="panel-section-title">Colors & Gradients</div>
+                        <div class="template-grid">
+                            <div class="template-card" onclick="loadTemplate('gradient1')">
+                                <div style="background: linear-gradient(135deg, #6366F1 0%, #A855F7 100%); height: 100%;"></div>
+                                <div class="template-label">Purple</div>
+                            </div>
+                            <div class="template-card" onclick="loadTemplate('gradient2')">
+                                <div style="background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%); height: 100%;"></div>
+                                <div class="template-label">Sunset</div>
+                            </div>
+                            <div class="template-card" onclick="loadTemplate('gradient3')">
+                                <div style="background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%); height: 100%;"></div>
+                                <div class="template-label">Ocean</div>
+                            </div>
+                            <div class="template-card" onclick="loadTemplate('gradient4')">
+                                <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); height: 100%;"></div>
+                                <div class="template-label">Emerald</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Text Panel -->
+                <div class="panel-content" id="text-panel" style="display: none;">
+                    <div class="panel-section">
+                        <button class="btn btn-primary w-100 mb-2" onclick="addText('Heading', 72, true)" style="padding: 1rem; font-size: 1rem;">
+                            <i class="fas fa-heading"></i> Add 3D Heading
+                        </button>
+                        <button class="btn btn-secondary w-100 mb-2" onclick="addText('Subheading', 42)">
+                            <i class="fas fa-font"></i> Add Subheading
+                        </button>
+                        <button class="btn btn-ghost w-100" onclick="addText('Body text', 24)">
+                            <i class="fas fa-paragraph"></i> Add Body Text
+                        </button>
+                    </div>
+                    
+                    <div id="text-properties" class="properties-section" style="display:none;">
+                        <div class="panel-section-title">Text Style</div>
+                        
+                        <div class="slider-container mt-2">
+                            <label><span>Font Size</span></label>
+                            <input type="range" class="slider" id="fontSizeSlider" min="10" max="200" value="40">
+                        </div>
+                        
+                        <div class="mb-2">
+                            <label style="display:block; margin-bottom:0.5rem; font-size:0.85rem; font-weight:600">Font Family</label>
+                            <select id="fontSelect">
+                                <option value="DM Sans">DM Sans</option>
+                                <option value="Fraunces">Fraunces</option>
+                                <option value="Arial">Arial</option>
+                                <option value="Impact">Impact</option>
+                                <option value="Georgia">Georgia</option>
+                                <option value="Courier New">Courier New</option>
+                                <option value="Verdana">Verdana</option>
+                            </select>
+                        </div>
+                        
+                        <div class="color-row">
+                            <div class="color-preview"><input type="color" id="textColorInput" value="#1E293B"></div>
+                            <span style="font-size:0.875rem; font-weight:600">Text Color</span>
+                        </div>
+
+                        <div class="panel-section-title">Gradient Effect</div>
+                        <div class="toggle-row">
+                            <span>Enable Gradient</span>
+                            <div class="toggle-switch" id="gradientToggle" onclick="toggleGradient()"></div>
+                        </div>
+                        <div id="gradient-controls" style="display:none;">
+                            <div class="gradient-presets">
+                                <div class="gradient-preset active" style="background: linear-gradient(135deg, #2563EB 0%, #F59E0B 100%);" onclick="setGradient('#2563EB', '#F59E0B')"></div>
+                                <div class="gradient-preset" style="background: linear-gradient(135deg, #EF4444 0%, #F59E0B 100%);" onclick="setGradient('#EF4444', '#F59E0B')"></div>
+                                <div class="gradient-preset" style="background: linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%);" onclick="setGradient('#06B6D4', '#3B82F6')"></div>
+                                <div class="gradient-preset" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);" onclick="setGradient('#10B981', '#059669')"></div>
+                                <div class="gradient-preset" style="background: linear-gradient(135deg, #F43F5E 0%, #FB923C 100%);" onclick="setGradient('#F43F5E', '#FB923C')"></div>
+                                <div class="gradient-preset" style="background: linear-gradient(135deg, #8B5CF6 0%, #D946EF 100%);" onclick="setGradient('#8B5CF6', '#D946EF')"></div>
+                                <div class="gradient-preset" style="background: linear-gradient(135deg, #0F172A 0%, #475569 100%);" onclick="setGradient('#0F172A', '#475569')"></div>
+                                <div class="gradient-preset" style="background: linear-gradient(135deg, #FCA5A5 0%, #FECDD3 100%);" onclick="setGradient('#FCA5A5', '#FECDD3')"></div>
+                            </div>
+                            <div class="grid-2 mt-2">
+                                <div class="color-row" style="margin-bottom:0">
+                                    <div class="color-preview"><input type="color" id="gradColor1" value="#2563EB" onchange="updateGradient()"></div>
+                                    <span style="font-size:0.8rem; font-weight:600">Start</span>
+                                </div>
+                                <div class="color-row" style="margin-bottom:0">
+                                    <div class="color-preview"><input type="color" id="gradColor2" value="#F59E0B" onchange="updateGradient()"></div>
+                                    <span style="font-size:0.8rem; font-weight:600">End</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-section-title">3D Effect</div>
+                        <div class="toggle-row">
+                            <span>Enable 3D Shadow</span>
+                            <div class="toggle-switch" id="shadow3dToggle" onclick="toggle3DShadow()"></div>
+                        </div>
+                        <div id="shadow3d-controls" style="display:none;">
+                            <div class="slider-container">
+                                <label><span>Depth</span></label>
+                                <input type="range" class="slider" id="shadow3dDepth" min="0" max="20" value="5" oninput="update3DShadow()">
+                            </div>
+                            <div class="color-row">
+                                <div class="color-preview"><input type="color" id="shadow3dColor" value="#0F172A" onchange="update3DShadow()"></div>
+                                <span style="font-size:0.875rem; font-weight:600">Shadow Color</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Elements Panel -->
+                <div class="panel-content" id="elements-panel" style="display: none;">
+                    <div class="panel-section">
+                        <div class="panel-section-title">Basic Shapes</div>
+                        <div class="grid-3">
+                            <button class="btn btn-ghost shape-btn" onclick="addShape('rectangle')">
+                                <i class="far fa-square" style="font-size: 1.75rem;"></i>
+                            </button>
+                            <button class="btn btn-ghost shape-btn" onclick="addShape('circle')">
+                                <i class="far fa-circle" style="font-size: 1.75rem;"></i>
+                            </button>
+                            <button class="btn btn-ghost shape-btn" onclick="addShape('triangle')">
+                                <i class="fas fa-play" style="font-size: 1.5rem; transform: rotate(-90deg);"></i>
+                            </button>
+                            <button class="btn btn-ghost shape-btn" onclick="addShape('line')">
+                                <i class="fas fa-minus" style="font-size: 1.75rem;"></i>
+                            </button>
+                            <button class="btn btn-ghost shape-btn" onclick="addShape('star')">
+                                <i class="far fa-star" style="font-size: 1.75rem;"></i>
+                            </button>
+                            <button class="btn btn-ghost shape-btn" onclick="addShape('heart')">
+                                <i class="far fa-heart" style="font-size: 1.75rem;"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="shape-properties" class="properties-section" style="display:none;">
+                        <div class="panel-section-title">Shape Style</div>
+                        <div class="color-row mt-2">
+                            <div class="color-preview"><input type="color" id="shapeFill" value="#2563EB"></div>
+                            <span style="font-size:0.875rem; font-weight:600">Fill Color</span>
+                        </div>
+                        <div class="color-row">
+                            <div class="color-preview"><input type="color" id="shapeStroke" value="transparent"></div>
+                            <span style="font-size:0.875rem; font-weight:600">Border Color</span>
+                        </div>
+                        
+                        <div class="panel-section-title">Border Radius</div>
+                        <div class="slider-container">
+                            <label><span>Corner Radius</span></label>
+                            <input type="range" class="slider" id="borderRadiusSlider" min="0" max="100" value="0" oninput="updateShapeBorderRadius()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Tools Panel -->
+                <div class="panel-content" id="ai-panel" style="display: none;">
+                    <div class="panel-section">
+                        <div class="panel-section-title">Background Remover</div>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4;">Removes background instantly via AI. Select an image layer first to activate.</p>
+                        <button class="btn btn-secondary w-100 mb-2" id="removeBgBtn" onclick="removeBackgroundAI()" style="padding: 1rem;">
+                            <i class="fas fa-eraser"></i> Remove Background
+                        </button>
+                    </div>
+                    
+                    <div class="panel-section properties-section">
+                        <div class="panel-section-title">AI Image Generator</div>
+                        <textarea id="aiPrompt" style="min-height: 80px; margin-bottom: 1rem;" placeholder="A futuristic city at sunset with flying cars..."></textarea>
+                        <button class="btn btn-primary w-100" id="generateAiBtn" onclick="generateImageAI()" style="padding: 1rem;">
+                            <i class="fas fa-paint-brush"></i> Generate AI Image
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Layers Panel -->
+                <div class="panel-content" id="layers-panel" style="display: none;">
+                    <div class="panel-section-title">Canvas Layers</div>
+                    <div id="layersContainer"></div>
+                </div>
+
+                <!-- Adjust Panel -->
+                <div class="panel-content" id="adjust-panel" style="display: none;">
+                    <div class="panel-section">
+                        <div class="panel-section-title">Image Filters</div>
+                        <div class="slider-container">
+                            <label><span>Brightness</span></label>
+                            <input type="range" class="slider" id="brightness" min="0" max="200" value="100">
+                        </div>
+                        <div class="slider-container">
+                            <label><span>Contrast</span></label>
+                            <input type="range" class="slider" id="contrast" min="0" max="200" value="100">
+                        </div>
+                        <div class="slider-container">
+                            <label><span>Saturation</span></label>
+                            <input type="range" class="slider" id="saturation" min="0" max="200" value="100">
+                        </div>
+                        <div class="slider-container">
+                            <label><span>Blur (px)</span></label>
+                            <input type="range" class="slider" id="blur" min="0" max="10" value="0" step="0.5">
+                        </div>
+                    </div>
+                    
+                    <div class="panel-section properties-section">
+                        <div class="panel-section-title">Export Options</div>
+                        <div class="toggle-row">
+                            <span>Transparent Background</span>
+                            <div class="toggle-switch" id="transparentBgToggle"></div>
+                        </div>
+                        <div class="mt-2">
+                            <label style="display:block; margin-bottom:0.5rem; font-size:0.85rem; font-weight:600">Format</label>
+                            <select id="exportFormat">
+                                <option value="png">PNG (High Quality)</option>
+                                <option value="jpg">JPG (Compressed)</option>
+                                <option value="webp">WebP (Modern)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas Area -->
+            <main class="canvas-area">
+                <div class="canvas-toolbar">
+                    <div class="zoom-controls">
+                        <button class="btn btn-ghost btn-icon" style="border:none" onclick="state.zoom = Math.max(0.1, state.zoom - 0.1); updateZoom()">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <button class="btn btn-ghost" style="border:none; font-weight: 700; color: var(--dark)" onclick="state.zoom = 1; updateZoom()">
+                            <span id="zoomLevel">50%</span>
+                        </button>
+                        <button class="btn btn-ghost btn-icon" style="border:none" onclick="state.zoom = Math.min(3, state.zoom + 0.1); updateZoom()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div style="flex: 1"></div>
+                    <button class="btn btn-ghost btn-icon" style="color: var(--danger); background: var(--surface); box-shadow: var(--shadow-sm); border-color: var(--border);" onclick="deleteSelected()" title="Delete Layer">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+
+                <div class="canvas-container" id="scrollContainer">
+                    <div class="canvas-wrapper" id="canvasWrapper">
+                        <canvas id="mainCanvas" width="1280" height="720"></canvas>
+                        
+                        <!-- In-place Text Editor -->
+                        <div class="text-editor-overlay" id="textEditor" contenteditable="true" spellcheck="false"></div>
+                        
+                        <!-- Transform Overlay -->
+                        <div class="transform-controls" id="transformControls">
+                            <div class="transform-handle handle-nw" data-handle="nw"></div>
+                            <div class="transform-handle handle-ne" data-handle="ne"></div>
+                            <div class="transform-handle handle-sw" data-handle="sw"></div>
+                            <div class="transform-handle handle-se" data-handle="se"></div>
+                            <div class="rotate-handle" id="rotateHandle">
+                                <i class="fas fa-sync-alt" style="font-size: 0.85rem;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Custom Context Menu -->
+    <div id="contextMenu" class="context-menu">
+        <div class="context-item" onclick="layerAction('front')">
+            <span><i class="fas fa-angle-double-up"></i> Bring to Front</span>
+            <span class="context-shortcut">⇧⌘]</span>
+        </div>
+        <div class="context-item" onclick="layerAction('forward')">
+            <span><i class="fas fa-angle-up"></i> Bring Forward</span>
+            <span class="context-shortcut">⌘]</span>
+        </div>
+        <div class="context-item" onclick="layerAction('backward')">
+            <span><i class="fas fa-angle-down"></i> Send Backward</span>
+            <span class="context-shortcut">⌘[</span>
+        </div>
+        <div class="context-item" onclick="layerAction('back')">
+            <span><i class="fas fa-angle-double-down"></i> Send to Back</span>
+            <span class="context-shortcut">⇧⌘[</span>
+        </div>
+        <div class="context-separator"></div>
+        <div class="context-item" onclick="duplicateObject()">
+            <span><i class="fas fa-copy"></i> Duplicate</span>
+            <span class="context-shortcut">⌘D</span>
+        </div>
+        <div class="context-separator"></div>
+        <div class="context-item" style="color:var(--danger)" onclick="deleteSelected()">
+            <span><i class="fas fa-trash"></i> Delete</span>
+            <span class="context-shortcut">⌫</span>
+        </div>
+    </div>
+
+    <script>
+        // --- Core State ---
+        const state = {
+            canvas: null,
+            ctx: null,
+            objects: [],
+            selectedObj: null,
+            zoom: 0.5,
+            
+            isDragging: false,
+            isResizing: false,
+            isRotating: false,
+            isEditingText: false,
+            lastClickTime: 0,
+            
+            dragStartMouseX: 0,
+            dragStartMouseY: 0,
+            dragStartObjX: 0,
+            dragStartObjY: 0,
+            resizeHandle: null,
+            
+            backgroundImage: null,
+            backgroundColor: '#ffffff',
+            transparentBackground: false,
+            
+            history: [],
+            historyStep: -1
+        };
+
+        // Measure text helper
+        function measureTextObj(obj) {
+            state.ctx.font = `${obj.fontSize}px ${obj.fontFamily}`;
+            const lines = obj.text.split('\n');
+            let maxWidth = 0;
+            lines.forEach(line => {
+                const metrics = state.ctx.measureText(line);
+                if (metrics.width > maxWidth) maxWidth = metrics.width;
+            });
+            obj.width = Math.max(20, maxWidth + 10);
+            obj.height = Math.max(obj.fontSize * 1.2, lines.length * obj.fontSize * 1.2);
+        }
+
+        // --- Class Definition ---
+        class CanvasObject {
+            constructor(type, props) {
+                this.id = Date.now() + Math.random();
+                this.type = type; 
+                this.x = props.x || 0;
+                this.y = props.y || 0;
+                this.width = props.width || 100;
+                this.height = props.height || 100;
+                this.rotation = props.rotation || 0; 
+                this.opacity = props.opacity !== undefined ? props.opacity : 1;
+                this.shadowColor = props.shadowColor || 'transparent';
+                this.shadowBlur = props.shadowBlur || 0;
+                this.shadowOffX = props.shadowOffX || 0;
+                this.shadowOffY = props.shadowOffY || 0;
+                this.data = props.data || {};
+                this.fill = props.fill || '#2563EB';
+                this.stroke = props.stroke || 'transparent';
+                this.borderRadius = props.borderRadius || 0;
+                this.text = props.text || '';
+                this.color = props.color || '#1E293B';
+                this.fontSize = props.fontSize || 40;
+                this.fontFamily = props.fontFamily || 'DM Sans';
+                this.useGradient = props.useGradient || false;
+                this.gradientColor1 = props.gradientColor1 || '#2563EB';
+                this.gradientColor2 = props.gradientColor2 || '#F59E0B';
+                this.use3D = props.use3D || false;
+                this.shadow3dDepth = props.shadow3dDepth || 5;
+                this.shadow3dColor = props.shadow3dColor || '#0F172A';
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                if (this.shadowColor !== 'transparent') {
+                    ctx.shadowColor = this.shadowColor; ctx.shadowBlur = this.shadowBlur;
+                    ctx.shadowOffsetX = this.shadowOffX; ctx.shadowOffsetY = this.shadowOffY;
+                }
+                ctx.translate(this.x, this.y); ctx.rotate(this.rotation);
+                if (this.type === 'shape') {
+                    ctx.fillStyle = this.fill; ctx.strokeStyle = this.stroke; ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    if (this.data.shape === 'rectangle') this.roundRect(ctx, -this.width/2, -this.height/2, this.width, this.height, this.borderRadius);
+                    else if (this.data.shape === 'circle') ctx.arc(0, 0, this.width/2, 0, Math.PI*2);
+                    else if (this.data.shape === 'triangle') { ctx.moveTo(0, -this.height/2); ctx.lineTo(this.width/2, this.height/2); ctx.lineTo(-this.width/2, this.height/2); ctx.closePath(); }
+                    else if (this.data.shape === 'line') { ctx.lineWidth = Math.max(2, this.height/10); ctx.moveTo(-this.width/2, 0); ctx.lineTo(this.width/2, 0); ctx.strokeStyle = this.fill; ctx.stroke(); }
+                    else if (this.data.shape === 'star') this.drawStar(ctx, 0, 0, 5, this.width/2, this.width/4);
+                    else if (this.data.shape === 'heart') this.drawHeart(ctx, 0, 0, this.width/2);
+                    if(this.data.shape !== 'line') { ctx.fill(); if(this.stroke !== 'transparent') ctx.stroke(); }
+                } 
+                else if (this.type === 'text') this.drawText(ctx);
+                else if (this.type === 'image' && this.data.img) ctx.drawImage(this.data.img, -this.width/2, -this.height/2, this.width, this.height);
+                ctx.restore();
+            }
+
+            roundRect(ctx, x, y, width, height, radius) {
+                if (radius === 0) { ctx.rect(x, y, width, height); return; }
+                const r = Math.min(radius, width / 2, height / 2);
+                ctx.moveTo(x + r, y); ctx.lineTo(x + width - r, y); ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+                ctx.lineTo(x + width, y + height - r); ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+                ctx.lineTo(x + r, y + height); ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+                ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath();
+            }
+
+            drawText(ctx) {
+                ctx.font = `${this.fontSize}px ${this.fontFamily}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                const lines = this.text.split('\n'); const lineHeight = this.fontSize * 1.2;
+                lines.forEach((line, i) => {
+                    const y = (i - (lines.length-1)/2) * lineHeight;
+                    if (this.use3D && this.shadow3dDepth > 0) { ctx.fillStyle = this.shadow3dColor; for (let j = 0; j < this.shadow3dDepth; j++) ctx.fillText(line, j * 0.5, y + j * 0.5); }
+                    if (this.useGradient) {
+                        const gradient = ctx.createLinearGradient(-this.width/2, 0, this.width/2, 0);
+                        gradient.addColorStop(0, this.gradientColor1); gradient.addColorStop(1, this.gradientColor2); ctx.fillStyle = gradient;
+                    } else ctx.fillStyle = this.color;
+                    ctx.fillText(line, 0, y);
+                });
+            }
+
+            drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+                let rot = Math.PI / 2 * 3; let x = cx; let y = cy; let step = Math.PI / spikes;
+                ctx.beginPath(); ctx.moveTo(cx, cy - outerRadius);
+                for (let i = 0; i < spikes; i++) {
+                    x = cx + Math.cos(rot) * outerRadius; y = cy + Math.sin(rot) * outerRadius; ctx.lineTo(x, y); rot += step;
+                    x = cx + Math.cos(rot) * innerRadius; y = cy + Math.sin(rot) * innerRadius; ctx.lineTo(x, y); rot += step;
+                }
+                ctx.lineTo(cx, cy - outerRadius); ctx.closePath();
+            }
+
+            drawHeart(ctx, x, y, size) {
+                ctx.beginPath(); ctx.moveTo(x, y + size / 4);
+                ctx.quadraticCurveTo(x, y, x + size / 4, y); ctx.quadraticCurveTo(x + size / 2, y, x + size / 2, y + size / 4);
+                ctx.quadraticCurveTo(x + size / 2, y + size / 2, x, y + size * 3/4); ctx.quadraticCurveTo(x - size / 2, y + size / 2, x - size / 2, y + size / 4);
+                ctx.quadraticCurveTo(x - size / 2, y, x - size / 4, y); ctx.quadraticCurveTo(x, y, x, y + size / 4); ctx.closePath();
+            }
+
+            contains(mx, my) {
+                const dx = mx - this.x; const dy = my - this.y;
+                const rx = dx * Math.cos(-this.rotation) - dy * Math.sin(-this.rotation);
+                const ry = dx * Math.sin(-this.rotation) + dy * Math.cos(-this.rotation);
+                return (rx >= -this.width/2 && rx <= this.width/2 && ry >= -this.height/2 && ry <= this.height/2);
+            }
+        }
+
+        // --- Initialization ---
+        window.onload = () => {
+            state.canvas = document.getElementById('mainCanvas'); state.ctx = state.canvas.getContext('2d');
+            render(); setupEventListeners(); updateZoom(); saveHistory();
+        };
+
+        function setupEventListeners() {
+            const wrapper = document.getElementById('canvasWrapper');
+            wrapper.addEventListener('mousedown', handlePointerDown); window.addEventListener('mousemove', handlePointerMove); window.addEventListener('mouseup', handlePointerUp);
+            wrapper.addEventListener('touchstart', handleTouchStart, {passive: false}); wrapper.addEventListener('touchmove', handleTouchMove, {passive: false}); wrapper.addEventListener('touchend', handleTouchEnd);
+            wrapper.addEventListener('contextmenu', (e) => { e.preventDefault(); if(state.selectedObj) { const menu = document.getElementById('contextMenu'); menu.style.display = 'block'; menu.style.left = Math.min(e.pageX, window.innerWidth - 200) + 'px'; menu.style.top = Math.min(e.pageY, window.innerHeight - 250) + 'px'; } });
+            window.addEventListener('click', (e) => { if (!e.target.closest('.context-menu')) document.getElementById('contextMenu').style.display = 'none'; });
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.addEventListener('click', () => switchPanel(btn)));
+            document.getElementById('uploadBtn').addEventListener('click', () => document.getElementById('imageUpload').click()); document.getElementById('imageUpload').addEventListener('change', handleImageUpload);
+            document.getElementById('fontSelect').addEventListener('change', updateSelectedText); document.getElementById('fontSizeSlider').addEventListener('input', updateSelectedText); document.getElementById('textColorInput').addEventListener('input', updateSelectedText);
+            const textEditor = document.getElementById('textEditor'); textEditor.addEventListener('blur', finishTextEdit); textEditor.addEventListener('keydown', (e) => { if (e.key === 'Escape') finishTextEdit(); e.stopPropagation(); });
+            document.getElementById('shapeFill').addEventListener('input', updateSelectedShape); document.getElementById('shapeStroke').addEventListener('input', updateSelectedShape);
+            document.getElementById('opacitySlider').addEventListener('input', updateCommonProps); document.getElementById('shadowColorInput').addEventListener('input', updateCommonProps); document.getElementById('shadowBlurInput').addEventListener('input', updateCommonProps); document.getElementById('shadowOffXInput').addEventListener('input', updateCommonProps); document.getElementById('shadowOffYInput').addEventListener('input', updateCommonProps);
+            document.querySelectorAll('.transform-handle').forEach(h => { h.addEventListener('mousedown', (e) => { e.stopPropagation(); state.isResizing = true; state.resizeHandle = h.dataset.handle; state.dragStartMouseX = e.clientX; state.dragStartMouseY = e.clientY; if(state.selectedObj) { state.dragStartObjX = state.selectedObj.width; state.dragStartObjY = state.selectedObj.height; } }); });
+            document.getElementById('rotateHandle').addEventListener('mousedown', (e) => { e.stopPropagation(); state.isRotating = true; });
+            ['brightness', 'contrast', 'saturation', 'blur'].forEach(id => document.getElementById(id).addEventListener('input', render));
+            document.getElementById('transparentBgToggle').addEventListener('click', function() { this.classList.toggle('active'); state.transparentBackground = this.classList.contains('active'); render(); });
+            document.addEventListener('keydown', handleKeyboard);
+        }
+
+        // --- Core Functions ---
+        function handleTouchStart(e) { if (e.touches.length === 1) { const touch = e.touches[0]; handlePointerDown(new MouseEvent('mousedown', { clientX: touch.clientX, clientY: touch.clientY, button: 0 })); } }
+        function handleTouchMove(e) { if (e.touches.length === 1) { e.preventDefault(); const touch = e.touches[0]; handlePointerMove(new MouseEvent('mousemove', { clientX: touch.clientX, clientY: touch.clientY })); } }
+        function handleTouchEnd(e) { handlePointerUp(new MouseEvent('mouseup', {})); }
+        function handleKeyboard(e) { if (state.isEditingText) return; if ((e.metaKey || e.ctrlKey) && e.key === 'z') { e.preventDefault(); if (e.shiftKey) document.getElementById('redoBtn').click(); else document.getElementById('undoBtn').click(); } if ((e.metaKey || e.ctrlKey) && e.key === 'y') { e.preventDefault(); document.getElementById('redoBtn').click(); } if ((e.metaKey || e.ctrlKey) && e.key === 'd') { e.preventDefault(); duplicateObject(); } if (e.key === 'Delete' || e.key === 'Backspace') if (state.selectedObj) deleteSelected(); if (e.key === 'Escape') selectObject(null); }
+        function getCanvasCoords(clientX, clientY) { const rect = state.canvas.getBoundingClientRect(); const scaleX = state.canvas.width / rect.width; const scaleY = state.canvas.height / rect.height; return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY }; }
+        function handlePointerDown(e) { if (e.button === 2 || state.isEditingText) return; const coords = getCanvasCoords(e.clientX, e.clientY); if (state.selectedObj && state.selectedObj.type === 'text' && state.selectedObj.contains(coords.x, coords.y)) { if (!state.lastClickTime || Date.now() - state.lastClickTime < 300) { startTextEdit(); state.lastClickTime = 0; return; } state.lastClickTime = Date.now(); } let clicked = null; for (let i = state.objects.length - 1; i >= 0; i--) { if (state.objects[i].contains(coords.x, coords.y)) { clicked = state.objects[i]; break; } } selectObject(clicked); if (clicked) { state.isDragging = true; state.dragStartMouseX = coords.x; state.dragStartMouseY = coords.y; state.dragStartObjX = clicked.x; state.dragStartObjY = clicked.y; if(clicked.type === 'text') switchPanel(document.querySelector('[data-target="text-panel"]')); else if(clicked.type === 'shape') switchPanel(document.querySelector('[data-target="elements-panel"]')); } }
+        function handlePointerMove(e) { if (state.isEditingText) return; if (!state.selectedObj) return; const coords = getCanvasCoords(e.clientX, e.clientY); if (state.isDragging) { state.selectedObj.x = state.dragStartObjX + (coords.x - state.dragStartMouseX); state.selectedObj.y = state.dragStartObjY + (coords.y - state.dragStartMouseY); render(); updateSelectionOverlay(); } else if (state.isResizing) { const sensitivityX = state.canvas.width / state.canvas.getBoundingClientRect().width; const sensitivityY = state.canvas.height / state.canvas.getBoundingClientRect().height; const dx = (e.clientX - state.dragStartMouseX) * sensitivityX; const dy = (e.clientY - state.dragStartMouseY) * sensitivityY; const obj = state.selectedObj; if (state.resizeHandle === 'se') { obj.width = Math.max(10, state.dragStartObjX + dx); obj.height = Math.max(10, state.dragStartObjY + dy); } else if (state.resizeHandle === 'sw') { obj.width = Math.max(10, state.dragStartObjX - dx); obj.height = Math.max(10, state.dragStartObjY + dy); } else if (state.resizeHandle === 'ne') { obj.width = Math.max(10, state.dragStartObjX + dx); obj.height = Math.max(10, state.dragStartObjY - dy); } else if (state.resizeHandle === 'nw') { obj.width = Math.max(10, state.dragStartObjX - dx); obj.height = Math.max(10, state.dragStartObjY - dy); } render(); updateSelectionOverlay(); } else if (state.isRotating) { const rect = state.canvas.getBoundingClientRect(); const cx = rect.left + state.selectedObj.x * (rect.width/state.canvas.width); const cy = rect.top + state.selectedObj.y * (rect.height/state.canvas.height); const angle = Math.atan2(e.clientY - cy, e.clientX - cx); state.selectedObj.rotation = angle + Math.PI/2; render(); updateSelectionOverlay(); } }
+        function handlePointerUp() { if (state.isDragging || state.isResizing || state.isRotating) saveHistory(); state.isDragging = false; state.isResizing = false; state.isRotating = false; state.resizeHandle = null; }
+        function render() { state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height); const brightness = document.getElementById('brightness').value; const contrast = document.getElementById('contrast').value; const saturation = document.getElementById('saturation').value; const blur = document.getElementById('blur').value; state.ctx.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) blur(${blur}px)`; if (!state.transparentBackground) { state.ctx.fillStyle = state.backgroundColor; state.ctx.fillRect(0, 0, state.canvas.width, state.canvas.height); if (state.backgroundImage) state.ctx.drawImage(state.backgroundImage, 0, 0, state.canvas.width, state.canvas.height); } state.objects.forEach(obj => { if (state.isEditingText && obj === state.selectedObj) return; obj.draw(state.ctx); }); state.ctx.filter = 'none'; }
+        function startTextEdit() { if (!state.selectedObj || state.selectedObj.type !== 'text') return; state.isEditingText = true; const editor = document.getElementById('textEditor'); const obj = state.selectedObj; const scale = state.zoom; editor.innerText = obj.text; editor.style.display = 'flex'; editor.style.left = `${obj.x * scale}px`; editor.style.top = `${obj.y * scale}px`; editor.style.minWidth = `${obj.width * scale}px`; editor.style.minHeight = `${obj.height * scale}px`; editor.style.fontSize = `${obj.fontSize * scale}px`; editor.style.fontFamily = obj.fontFamily; editor.style.color = obj.useGradient ? obj.gradientColor1 : obj.color; editor.style.transform = `translate(-50%, -50%) rotate(${obj.rotation}rad)`; document.getElementById('transformControls').style.display = 'none'; render(); editor.focus(); const range = document.createRange(); range.selectNodeContents(editor); const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range); }
+        function finishTextEdit() { if (!state.isEditingText) return; const editor = document.getElementById('textEditor'); if (state.selectedObj) { state.selectedObj.text = editor.innerText || " "; measureTextObj(state.selectedObj); saveHistory(); } editor.style.display = 'none'; state.isEditingText = false; document.getElementById('transformControls').style.display = ''; render(); updateSelectionOverlay(); }
+        function updateSelectionOverlay() { const overlay = document.getElementById('transformControls'); if (!state.selectedObj || state.isEditingText) { overlay.style.display = 'none'; overlay.classList.remove('active'); return; } overlay.style.display = 'block'; overlay.classList.add('active'); const scale = state.zoom; overlay.style.left = `${state.selectedObj.x * scale}px`; overlay.style.top = `${state.selectedObj.y * scale}px`; overlay.style.width = `${state.selectedObj.width * scale}px`; overlay.style.height = `${state.selectedObj.height * scale}px`; overlay.style.transform = `translate(-50%, -50%) rotate(${state.selectedObj.rotation}rad)`; updateInputValues(state.selectedObj); }
+        function updateInputValues(obj) { document.getElementById('opacitySlider').value = obj.opacity; document.getElementById('opacityVal').innerText = Math.round(obj.opacity*100)+'%'; document.getElementById('shadowColorInput').value = obj.shadowColor === 'transparent' ? '#0F172A' : obj.shadowColor; document.getElementById('shadowBlurInput').value = obj.shadowBlur; document.getElementById('shadowOffXInput').value = obj.shadowOffX; document.getElementById('shadowOffYInput').value = obj.shadowOffY; if(obj.type === 'text') { document.getElementById('fontSizeSlider').value = obj.fontSize; document.getElementById('textColorInput').value = obj.color; document.getElementById('fontSelect').value = obj.fontFamily; document.getElementById('gradientToggle').classList.toggle('active', obj.useGradient); document.getElementById('gradient-controls').style.display = obj.useGradient ? 'block' : 'none'; if (obj.useGradient) { document.getElementById('gradColor1').value = obj.gradientColor1; document.getElementById('gradColor2').value = obj.gradientColor2; } document.getElementById('shadow3dToggle').classList.toggle('active', obj.use3D); document.getElementById('shadow3d-controls').style.display = obj.use3D ? 'block' : 'none'; if (obj.use3D) { document.getElementById('shadow3dDepth').value = obj.shadow3dDepth; document.getElementById('shadow3dColor').value = obj.shadow3dColor; } } if(obj.type === 'shape') { document.getElementById('shapeFill').value = obj.fill; document.getElementById('shapeStroke').value = obj.stroke; document.getElementById('borderRadiusSlider').value = obj.borderRadius || 0; } }
+        function updateZoom() { document.getElementById('mainCanvas').style.width = `${state.canvas.width * state.zoom}px`; document.getElementById('mainCanvas').style.height = `${state.canvas.height * state.zoom}px`; const wrapper = document.getElementById('canvasWrapper'); wrapper.style.width = `${state.canvas.width * state.zoom}px`; wrapper.style.height = `${state.canvas.height * state.zoom}px`; document.getElementById('zoomLevel').textContent = Math.round(state.zoom * 100) + '%'; if(state.selectedObj) updateSelectionOverlay(); }
+
+        // --- API Keys ---
+        const HF_TOKEN = "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";
+        const REMOVEBG_KEY = "R5AKhpHyb5b7SSRBJj2gmdeK";
+
+        // --- AI Implementation ---
+        async function removeBackgroundAI() {
+            if (!state.selectedObj || state.selectedObj.type !== 'image') {
+                alert('Please select an image layer first.');
+                return;
+            }
+
+            const btn = document.getElementById('removeBgBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
+            btn.disabled = true;
+
+            try {
+                // Get selected image as blob
+                const img = state.selectedObj.data.img;
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = img.width; tempCanvas.height = img.height;
+                tempCanvas.getContext('2d').drawImage(img, 0, 0);
+                
+                const blob = await new Promise(res => tempCanvas.toBlob(res, 'image/png'));
+                const formData = new FormData();
+                formData.append('image_file', blob);
+                formData.append('size', 'auto');
+
+                const response = await fetch("https://api.remove.bg/v1.0/removebg", {
+                    method: "POST",
+                    headers: { "X-Api-Key": REMOVEBG_KEY },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.errors[0].title || "API Error");
+                }
+
+                const resultBlob = await response.blob();
+                const url = URL.createObjectURL(resultBlob);
+                
+                const newImg = new Image();
+                newImg.onload = () => {
+                    state.selectedObj.data.img = newImg;
+                    render(); saveHistory();
+                    btn.innerHTML = originalText; btn.disabled = false;
+                };
+                newImg.src = url;
+
+            } catch (error) {
+                alert("Remove.bg Error: " + error.message);
+                btn.innerHTML = originalText; btn.disabled = false;
+            }
+        }
+
+        async function generateImageAI() {
+            const prompt = document.getElementById('aiPrompt').value.trim();
+            if (!prompt) { alert('Please enter a description.'); return; }
+
+            const btn = document.getElementById('generateAiBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            btn.disabled = true;
+
+            try {
+                // Dynamically import the latest Hugging Face Inference library from CDN
+                const hfModule = await import("https://cdn.jsdelivr.net/npm/@huggingface/inference/+esm");
+                
+                // Fallback handling to ensure compatibility with different library versions
+                // (HfInference is standard in JS, but Python users often look for InferenceClient)
+                const ClientConstructor = hfModule.InferenceClient || hfModule.HfInference || hfModule.default;
+                
+                if (!ClientConstructor) {
+                    throw new Error("Could not find the Hugging Face Client constructor in the imported library.");
+                }
+
+                // Initialize the client using the provided token
+                const client = new ClientConstructor(HF_TOKEN);
+
+                // Call the API with the exact payload requested
+                const imageBlob = await client.textToImage({
+                    provider: "nscale",
+                    model: "stabilityai/stable-diffusion-xl-base-1.0",
+                    inputs: prompt,
+                    parameters: { num_inference_steps: 5 },
+                });
+
+                const url = URL.createObjectURL(imageBlob);
+
+                const img = new Image();
+                img.onload = () => {
+                    const maxSize = 600;
+                    let w = img.width, h = img.height;
+                    if (w > maxSize) { h *= (maxSize/w); w = maxSize; }
+                    
+                    const imgObj = new CanvasObject('image', {
+                        x: state.canvas.width/2, y: state.canvas.height/2,
+                        width: w, height: h, data: { img: img }
+                    });
+                    state.objects.push(imgObj); selectObject(imgObj);
+                    updateLayersList(); render(); saveHistory();
+                    btn.innerHTML = originalText; btn.disabled = false;
+                };
+                img.src = url;
+
+            } catch (error) {
+                alert("Hugging Face Error: " + error.message);
+                btn.innerHTML = originalText; btn.disabled = false;
+            }
+        }
+
+        // --- Core Editor Actions ---
+        function addText(content, size, is3D = false) { const textObj = new CanvasObject('text', { x: state.canvas.width/2, y: state.canvas.height/2, text: content, fontSize: size, color: '#1E293B', use3D: is3D, shadow3dDepth: is3D ? 5 : 0, useGradient: false }); measureTextObj(textObj); state.objects.push(textObj); selectObject(textObj); updateLayersList(); render(); saveHistory(); switchPanel(document.querySelector('[data-target="text-panel"]')); setTimeout(() => startTextEdit(), 50); }
+        function addShape(type) { let width = 200, height = 200; if(type === 'line') height = 50; const shapeObj = new CanvasObject('shape', { x: state.canvas.width/2, y: state.canvas.height/2, width: width, height: height, fill: '#2563EB', borderRadius: 0, data: { shape: type } }); state.objects.push(shapeObj); selectObject(shapeObj); updateLayersList(); render(); saveHistory(); }
+        function handleImageUpload(e) { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (event) => { const img = new Image(); img.onload = () => { let w = img.width, h = img.height; const maxSize = Math.min(state.canvas.width, state.canvas.height) * 0.8; if (w > maxSize || h > maxSize) { if (w > h) { h = (maxSize / w) * h; w = maxSize; } else { w = (maxSize / h) * w; h = maxSize; } } const imgObj = new CanvasObject('image', { x: state.canvas.width/2, y: state.canvas.height/2, width: w, height: h, data: { img: img } }); state.objects.push(imgObj); selectObject(imgObj); updateLayersList(); render(); saveHistory(); }; img.src = event.target.result; }; reader.readAsDataURL(file); e.target.value = ''; }
+        function selectObject(obj) { if (state.isEditingText) finishTextEdit(); state.selectedObj = obj; updateSelectionOverlay(); document.getElementById('common-properties').style.display = obj ? 'block' : 'none'; document.getElementById('text-properties').style.display = (obj && obj.type === 'text') ? 'block' : 'none'; document.getElementById('shape-properties').style.display = (obj && obj.type === 'shape') ? 'block' : 'none'; if(obj && obj.type === 'shape') { document.getElementById('shapeFill').value = obj.fill; document.getElementById('shapeStroke').value = obj.stroke; document.getElementById('borderRadiusSlider').value = obj.borderRadius || 0; } }
+        function updateSelectedText() { if(!state.selectedObj || state.selectedObj.type !== 'text') return; state.selectedObj.fontSize = parseInt(document.getElementById('fontSizeSlider').value); state.selectedObj.fontFamily = document.getElementById('fontSelect').value; state.selectedObj.color = document.getElementById('textColorInput').value; measureTextObj(state.selectedObj); render(); updateSelectionOverlay(); }
+        function updateSelectedShape() { if(!state.selectedObj || state.selectedObj.type !== 'shape') return; state.selectedObj.fill = document.getElementById('shapeFill').value; state.selectedObj.stroke = document.getElementById('shapeStroke').value; render(); }
+        function updateShapeBorderRadius() { if(!state.selectedObj || state.selectedObj.type !== 'shape') return; state.selectedObj.borderRadius = parseInt(document.getElementById('borderRadiusSlider').value); render(); }
+        function updateCommonProps() { if(!state.selectedObj) return; state.selectedObj.opacity = document.getElementById('opacitySlider').value; state.selectedObj.shadowColor = document.getElementById('shadowColorInput').value; state.selectedObj.shadowBlur = parseInt(document.getElementById('shadowBlurInput').value); state.selectedObj.shadowOffX = parseInt(document.getElementById('shadowOffXInput').value); state.selectedObj.shadowOffY = parseInt(document.getElementById('shadowOffYInput').value); render(); }
+        function toggleGradient() { if (!state.selectedObj || state.selectedObj.type !== 'text') return; const toggle = document.getElementById('gradientToggle'); toggle.classList.toggle('active'); state.selectedObj.useGradient = toggle.classList.contains('active'); document.getElementById('gradient-controls').style.display = state.selectedObj.useGradient ? 'block' : 'none'; render(); saveHistory(); }
+        function setGradient(c1, c2) { if (!state.selectedObj || state.selectedObj.type !== 'text') return; state.selectedObj.gradientColor1 = c1; state.selectedObj.gradientColor2 = c2; document.getElementById('gradColor1').value = c1; document.getElementById('gradColor2').value = c2; document.querySelectorAll('.gradient-preset').forEach(p => p.classList.remove('active')); event.target.classList.add('active'); render(); saveHistory(); }
+        function updateGradient() { if (!state.selectedObj || state.selectedObj.type !== 'text') return; state.selectedObj.gradientColor1 = document.getElementById('gradColor1').value; state.selectedObj.gradientColor2 = document.getElementById('gradColor2').value; render(); }
+        function toggle3DShadow() { if (!state.selectedObj || state.selectedObj.type !== 'text') return; const toggle = document.getElementById('shadow3dToggle'); toggle.classList.toggle('active'); state.selectedObj.use3D = toggle.classList.contains('active'); document.getElementById('shadow3d-controls').style.display = state.selectedObj.use3D ? 'block' : 'none'; render(); saveHistory(); }
+        function update3DShadow() { if (!state.selectedObj || state.selectedObj.type !== 'text') return; state.selectedObj.shadow3dDepth = parseInt(document.getElementById('shadow3dDepth').value); state.selectedObj.shadow3dColor = document.getElementById('shadow3dColor').value; render(); }
+        function loadTemplate(templateName) { state.objects = []; state.backgroundImage = null; const templates = { youtube: () => { resizeCanvas(1280, 720); state.backgroundColor = '#EF4444'; addText('Your Title Here', 80, true); state.selectedObj.color = '#ffffff'; state.selectedObj.y = state.canvas.height / 2; }, instagram: () => { resizeCanvas(1080, 1080); state.backgroundColor = '#F59E0B'; addText('Instagram Post', 72, true); state.selectedObj.useGradient = true; state.selectedObj.gradientColor1 = '#ffffff'; state.selectedObj.gradientColor2 = '#ffe4e1'; }, tiktok: () => { resizeCanvas(1080, 1920); state.backgroundColor = '#0F172A'; addText('TikTok Video', 96, true); state.selectedObj.color = '#06B6D4'; state.selectedObj.use3D = true; state.selectedObj.shadow3dColor = '#E11D48'; state.selectedObj.shadow3dDepth = 8; }, business: () => { resizeCanvas(1200, 630); state.backgroundColor = '#2563EB'; addText('Your Business', 64, true); state.selectedObj.color = '#ffffff'; addText('Tagline here', 32); state.objects[1].y += 80; state.objects[1].color = '#e0e7ff'; }, gradient1: () => { state.backgroundColor = '#8B5CF6'; }, gradient2: () => { state.backgroundColor = '#EF4444'; }, gradient3: () => { state.backgroundColor = '#06B6D4'; }, gradient4: () => { state.backgroundColor = '#10B981'; } }; if (templates[templateName]) { templates[templateName](); render(); saveHistory(); updateLayersList(); } if (window.innerWidth <= 768) closePanel(); }
+        function layerAction(action) { if(!state.selectedObj) return; const idx = state.objects.indexOf(state.selectedObj); if (action === 'front') { state.objects.splice(idx, 1); state.objects.push(state.selectedObj); } else if (action === 'back') { state.objects.splice(idx, 1); state.objects.unshift(state.selectedObj); } else if (action === 'forward' && idx < state.objects.length - 1) [state.objects[idx], state.objects[idx+1]] = [state.objects[idx+1], state.objects[idx]]; else if (action === 'backward' && idx > 0) [state.objects[idx], state.objects[idx-1]] = [state.objects[idx-1], state.objects[idx]]; render(); updateLayersList(); document.getElementById('contextMenu').style.display = 'none'; saveHistory(); }
+        function duplicateObject() { if(!state.selectedObj) return; const o = state.selectedObj; const clone = new CanvasObject(o.type, {...o, x: o.x+30, y: o.y+30, data: {...o.data}}); state.objects.push(clone); selectObject(clone); updateLayersList(); render(); saveHistory(); document.getElementById('contextMenu').style.display = 'none'; }
+        function deleteSelected() { if(!state.selectedObj) return; if (state.isEditingText) { state.isEditingText = false; document.getElementById('textEditor').style.display = 'none'; } state.objects = state.objects.filter(o => o !== state.selectedObj); selectObject(null); document.getElementById('transformControls').style.display = 'none'; updateLayersList(); render(); saveHistory(); document.getElementById('contextMenu').style.display = 'none'; }
+        function switchPanel(btn) { document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); const target = btn.dataset.target; const drawer = document.getElementById('sidePanel'); const title = document.getElementById('panelTitle'); const titles = { 'upload-panel': 'Upload & Size', 'templates-panel': 'Templates', 'text-panel': 'Text Tools', 'elements-panel': 'Shapes', 'ai-panel': 'AI Designer', 'layers-panel': 'Layers', 'adjust-panel': 'Adjust & Export' }; title.innerText = titles[target] || 'Properties'; document.querySelectorAll('.panel-content').forEach(p => p.style.display = 'none'); document.getElementById(target).style.display = 'block'; if(window.innerWidth <= 768) drawer.style.display = 'flex'; }
+        function closePanel() { document.getElementById('sidePanel').style.display = 'none'; document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active')); }
+        function updateLayersList() { const container = document.getElementById('layersContainer'); container.innerHTML = ''; if (state.objects.length === 0) { container.innerHTML = '<div style="text-align:center; padding: 2rem; color: var(--text-muted);"><i class="fas fa-layer-group" style="font-size: 2rem; margin-bottom: 0.5rem; display:block;"></i>No layers yet</div>'; return; } [...state.objects].reverse().forEach((obj) => { const item = document.createElement('div'); item.className = 'layer-item' + (state.selectedObj === obj ? ' active' : ''); let icon = 'fa-square'; let name = obj.type; if (obj.type === 'text') { icon = 'fa-font'; name = obj.text.substring(0, 20) || 'Text'; } else if (obj.type === 'image') { icon = 'fa-image'; name = 'Image'; } else if (obj.type === 'shape') { if (obj.data.shape === 'circle') icon = 'fa-circle'; else if (obj.data.shape === 'triangle') icon = 'fa-play'; else if (obj.data.shape === 'star') icon = 'fa-star'; else if (obj.data.shape === 'heart') icon = 'fa-heart'; } item.innerHTML = `<i class="fas ${icon}"></i><span>${name}</span>`; item.onclick = () => selectObject(obj); container.appendChild(item); }); }
+        function resizeCanvas(w, h) { state.canvas.width = w; state.canvas.height = h; updateZoom(); render(); if(window.innerWidth <= 768) closePanel(); }
+        function saveHistory() { state.history = state.history.slice(0, state.historyStep + 1); const snapshot = state.objects.map(obj => ({ ...obj, data: obj.type === 'image' ? { img: obj.data.img ? obj.data.img.src : null } : obj.data })); state.history.push(JSON.stringify(snapshot)); state.historyStep++; if (state.history.length > 20) { state.history.shift(); state.historyStep--; } }
+        document.getElementById('undoBtn').onclick = () => { if (state.historyStep > 0) { state.historyStep--; restoreHistory(); } };
+        document.getElementById('redoBtn').onclick = () => { if (state.historyStep < state.history.length - 1) { state.historyStep++; restoreHistory(); } };
+        function restoreHistory() { const data = JSON.parse(state.history[state.historyStep]); state.objects = data.map(d => { const obj = new CanvasObject(d.type, d); Object.assign(obj, d); if (d.type === 'image' && d.data.img) { const img = new Image(); img.src = d.data.img; obj.data.img = img; } return obj; }); selectObject(null); updateLayersList(); render(); }
+        document.getElementById('downloadBtn').onclick = () => { selectObject(null); render(); const format = document.getElementById('exportFormat').value; const link = document.createElement('a'); let mimeType = 'image/png'; let extension = 'png'; if (format === 'jpg') { mimeType = 'image/jpeg'; extension = 'jpg'; } else if (format === 'webp') { mimeType = 'image/webp'; extension = 'webp'; } link.download = `Kanishka Net-Pix.${extension}`; link.href = state.canvas.toDataURL(mimeType, 0.95); link.click(); };
+    </script>
+</body>
+</html>
